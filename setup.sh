@@ -5,10 +5,16 @@ PARTITION="${DISK}1"
 
 echo DISK="$DISK", PARTITION="$PARTITION"
 
-parted -s "$DISK" mklabel msdos
-parted -s -a optimal "$DISK" mkpart primary ext4 0% 100%
-parted -s "$DISK" set 1 boot on
-mkfs.ext4 -F "$PARTITION"
+parted -s $DISK mklabel gpt
+parted -a optimal $DISK mkpart primary fat16 0% 5%
+parted -a optimal $DISK mkpart primary ext4 5% 100%
+
+sync
+
+parted $DISK set 1 esp on 
+
+mkfs.fat ${DEVICE}1
+mkfs.ext4 -F "${DEVICE}2"
 
 # you can find your closest server from: https://www.archlinux.org/mirrorlist/all/
 echo 'Server = http://mirror.archlinux.no/$repo/os/$arch' > /etc/pacman.d/mirrorlist
