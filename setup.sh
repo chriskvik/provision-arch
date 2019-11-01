@@ -24,9 +24,6 @@ pacman -Syy
 pacstrap /mnt $(pacman -Sqg base | sed 's/^linux$/&-lts/') base-devel grub openssh sudo ntp wget vim
 genfstab -p /mnt >> /mnt/etc/fstab
 
-pacstrap -i /mnt base
-genfstab -U -p /mnt >> /mnt/etc/fstab
-
 cp ./chroot.sh /mnt
 arch-chroot /mnt ./chroot.sh "$DISK"
 umount -R /mnt
