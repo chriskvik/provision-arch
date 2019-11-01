@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DISK="/dev/sda"
-PARTITION="${DISK}1"
+ROOT_PARTITION="${DISK}2"
 
 echo DISK="$DISK", PARTITION="$PARTITION"
 
@@ -18,7 +18,7 @@ mkfs.ext4 -F "${DEVICE}2"
 
 # you can find your closest server from: https://www.archlinux.org/mirrorlist/all/
 echo 'Server = http://mirror.archlinux.no/$repo/os/$arch' > /etc/pacman.d/mirrorlist
-mount "$PARTITION" /mnt
+mount "$ROOT_PARTITION" /mnt
 pacman -Syy
 
 pacstrap /mnt $(pacman -Sqg base | sed 's/^linux$/&-lts/') base-devel grub openssh sudo ntp wget vim
