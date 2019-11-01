@@ -6,7 +6,7 @@ HOME_DIR="/home/${USERNAME}"
 SWAP_SIZE=4G
 
 # grub as a bootloader
-grub-install --target=i386-pc --recheck "$1"
+grub-install --target=i386-pc --recheck "/dev/sda"
 
 # This makes the grub timeout 0, it's faster than 5 :)
 sudo sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/g' /etc/default/grub
