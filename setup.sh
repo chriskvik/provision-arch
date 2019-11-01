@@ -11,7 +11,7 @@ parted -s "$DISK" set 1 boot on
 mkfs.ext4 -F "$PARTITION"
 
 # you can find your closest server from: https://www.archlinux.org/mirrorlist/all/
-echo 'Server = Server = http://mirror.archlinux.no/$repo/os/$arch' > /etc/pacman.d/mirrorlist
+echo 'Server = http://mirror.archlinux.no/$repo/os/$arch' > /etc/pacman.d/mirrorlist
 mount "$PARTITION" /mnt
 pacman -Syy
 
@@ -20,8 +20,5 @@ genfstab -p /mnt >> /mnt/etc/fstab
 
 cp ./chroot.sh /mnt
 arch-chroot /mnt ./chroot.sh "$DISK"
-rm /mnt/chroot.sh
-rm /mnt/authorized_keys
-
 umount -R /mnt
 systemctl reboot
