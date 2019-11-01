@@ -26,5 +26,5 @@ genfstab -p /mnt >> /mnt/etc/fstab
 
 cp ./chroot.sh /mnt
 arch-chroot /mnt ./chroot.sh "$DISK"
-umount -R /mnt
-systemctl reboot
+#umount -R /mnt
+#systemctl reboot
