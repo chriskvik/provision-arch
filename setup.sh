@@ -13,8 +13,8 @@ sync
 
 parted $DISK set 1 esp on 
 
-mkfs.fat ${DEVICE}1
-mkfs.ext4 -F "${DEVICE}2"
+mkfs.fat ${DISK}1
+mkfs.ext4 -F "${DISK}2"
 
 # you can find your closest server from: https://www.archlinux.org/mirrorlist/all/
 echo 'Server = http://mirror.archlinux.no/$repo/os/$arch' > /etc/pacman.d/mirrorlist
