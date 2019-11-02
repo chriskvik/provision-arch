@@ -6,4 +6,4 @@ curl -sL https://raw.githubusercontent.com/chriskvik/provision-arch/master/first
 
 chmod +x setup.sh chroot.sh firstboot.sh
 
-sh setup.sh
+sh DISC=/dev/sda DISC1=/dev/sda1 DISC2=/dev/sda2 USERNAME=christian HOSTNAME=arch setup.sh
