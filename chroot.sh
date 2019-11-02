@@ -18,7 +18,7 @@ systemd-firstboot \
 
 hwclock --systohc --utc
 
-pacman -S --noconfirm linux dhcpd
+pacman -S --noconfirm linux dhcpcd
 
 # configure systemd boot
 bootctl --path=/boot install
