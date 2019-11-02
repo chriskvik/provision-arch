@@ -1,30 +1,39 @@
 #!/bin/bash
+set -exuo pipefail
 
-DISK="/dev/sda"
-ROOT_PARTITION="${DISK}2"
+# don't automatically re-execute if something goes wrong
+sed -i 's/bash live.sh//' ~/.bashrc
 
-echo DISK="$DISK", PARTITION="$PARTITION"
+# partition disk
+sgdisk \
+  -n 1:0:+128M -t 1:ef00 -c 1:bootefi \
+  -n 2:0:0 -t 2:8300 -c 2:linux \
+  -p "$DISC"
 
-parted -s $DISK mklabel gpt
-parted -a optimal $DISK mkpart primary fat16 0% 5%
-parted -a optimal $DISK mkpart primary ext4 5% 100%
+# create filesystems
+mkfs.fat -F32 "$DISC1"
+mkfs.ext4 "$DISC2"
 
-sync
+# mount filesystems
+mkdir -p /mnt
+mount "$DISC2" /mnt
+mkdir -p /mnt/boot
+mount "$DISC1" /mnt/boot
 
-parted $DISK set 1 esp on 
+# bootstrap
+pacstrap /mnt base base-devel
+genfstab -U -p /mnt >> /mnt/etc/fstab
 
-mkfs.fat ${DISK}1
-mkfs.ext4 -F "${DISK}2"
+# copy scripts
+cp ./chroot.sh /mnt/root
+cp ./firstboot.sh /mnt/root
 
-# you can find your closest server from: https://www.archlinux.org/mirrorlist/all/
-echo 'Server = http://mirror.archlinux.no/$repo/os/$arch' > /etc/pacman.d/mirrorlist
-mount "$ROOT_PARTITION" /mnt
-pacman -Syy
+# chroot
+arch-chroot /mnt /root/chroot.sh
 
-pacstrap /mnt $(pacman -Sqg base | sed 's/^linux$/&-lts/') base-devel grub openssh sudo ntp wget vim
-genfstab -p /mnt >> /mnt/etc/fstab
+# remove chroot script
+rm /mnt/root/chroot.sh
 
-cp ./chroot.sh /mnt
-arch-chroot /mnt ./chroot.sh "$DISK"
-#umount -R /mnt
-#systemctl reboot
+# clean up and reboot
+umount -R /mnt
+reboot
