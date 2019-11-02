@@ -1,53 +1,51 @@
 #!/bin/bash
+set -exuo pipefail
 
-HOST=arch
-USERNAME=christian
-HOME_DIR="/home/${USERNAME}"
-SWAP_SIZE=4G
+# generate locales
+cat <<EOF > /etc/locale.gen
+en_GB.UTF-8 UTF-8
+en_US.UTF-8 UTF-8
+EOF
 
-pacman -S grub efibootmgr dosfstools os-prober mtools linux-headers linux-lts linux-lts-headers
+locale-gen
 
-# bootloader setup
-mkdir /boot/EFI
-mount /dev/$DISK1 /boot/EFI
+# ctl
+systemd-firstboot \
+  --timezone=Europe/Oslo \
+  --locale=en_GB.UTF-8 \
+  --locale-messages=en_GB.UTF-8 \
+  --hostname="$HOSTNAME"
 
-grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
-cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
-grub-mkconfig -o /boot/grub/grub.cfg
+hwclock --systohc --utc
 
-# This makes the grub timeout 0, it's faster than 5 :)
-# sudo sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/g' /etc/default/grub
+pacman -S --noconfirm linux
 
-# run these following essential service by default
-# systemctl enable sshd.service
-# systemctl enable dhcpcd.service
-# systemctl enable ntpd.service
+# configure systemd boot
+bootctl --path=/boot install
 
-echo "$HOST" > /etc/hostname
+# Standard root config
+cat <<EOF > /boot/loader/entries/arch.conf
+title Arch Linux
+linux /vmlinuz-linux
+initrd /initramfs-linux.img
+options root=$(blkid --match-tag PARTUUID "$DISC2" | awk '{print $2}' | sed 's/"//g') rw
+EOF
 
-# inject vimrc config to default user dir if you like vim
-# echo -e 'runtime! archlinux.vim\nsyntax on' > /etc/skel/.vimrc
+# bootloader conf
+cat <<EOF > /boot/loader/loader.conf
+timeout 5
+default arch
+EOF
 
-# adding your normal user with additional wheel group so can sudo
-useradd -m -G wheel -s /bin/bash "$USERNAME"
+# enable autologin for first boot
+mkdir -p /etc/systemd/system/getty\@tty1.service.d
+cat <<EOF > /etc/systemd/system/getty@tty1.service.d/autologin.conf
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin root --noclear %I 38400 linux
+EOF
+systemctl enable getty\@tty1.service.d
+echo 'bash /root/firstboot.sh' > /root/.profile
 
-# adjust your timezone here
-ln -f -s /usr/share/zoneinfo/Norway/Oslo /etc/localtime
-hwclock --systohc
-
-# adjust your name servers here if you don't want to use google
-# echo 'name_servers="8.8.8.8 8.8.4.4"' >> /etc/resolvconf.conf
-# echo en_US.UTF-8 UTF-8 > /etc/locale.gen
-# echo LANG=en_US.UTF-8 > /etc/locale.conf
-# locale-gen
-
-
-# creating the swap file, if you have enough RAM, you can skip this step
-# fallocate -l "$SWAP_SIZE" /swapfile
-# chmod 600 /swapfile
-# mkswap /swapfile
-# echo /swapfile none swap defaults 0 0 >> /etc/fstab
-
-# auto-complete these essential commands
-# echo complete -cf sudo >> /etc/bash.bashrc
-# echo complete -cf man >> /etc/bash.bashrc
+# leave chroot
+exit
