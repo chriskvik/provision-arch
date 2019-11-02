@@ -25,6 +25,12 @@ pacman -S --noconfirm  sudo
 sed -i '/^# %wheel ALL=(ALL) ALL$/ s/^# //' /etc/sudoers
 visudo -cf /etc/sudoers
 
+
+echo Username?
+read USERNAME
+echo Password?
+read PASSWORD
+
 # set password for root and new user
 yes "$PASSWORD" | passwd || :
 useradd -m -g users -G audio,games,rfkill,uucp,video,wheel -s /bin/bash $USERNAME
