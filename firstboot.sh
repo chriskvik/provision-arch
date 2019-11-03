@@ -49,7 +49,7 @@ su $USERNAME -l << EOF
   chmod 600 /home/christian/.gnupg/gpg.conf
 EOF
 
-cat <<EOT >> /home/$USERNAME/.bashrc
+cat <<EOT > /home/$USERNAME/.bashrc
   export GPG_TTY="$(tty)"
   export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
   gpgconf --launch gpg-agent
