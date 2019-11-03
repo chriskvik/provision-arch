@@ -1,8 +1,9 @@
 sudo dhcpd
+mkdir .gnupg
 
-wget -P /home/$USERNAME/.gnupg https://raw.githubusercontent.com/drduh/config/master/gpg-agent.conf
-wget -P /home/$USERNAME/.gnupg https://raw.githubusercontent.com/drduh/config/master/gpg.conf
-chmod 600 /home/christian/.gnupg/gpg.conf
+wget -P .gnupg https://raw.githubusercontent.com/drduh/config/master/gpg-agent.conf
+wget -P .gnupg https://raw.githubusercontent.com/drduh/config/master/gpg.conf
+chmod 600 .gnupg/gpg.conf
 
 cat > .bashrc << EOF
   export GPG_TTY="$(tty)"
@@ -10,9 +11,10 @@ cat > .bashrc << EOF
   gpgconf --launch gpg-agent
 EOF
 
-source /home/$USERNAME/.bashrc
+source .bashrc
 killall gpg-agent
 gpg-connect-agent updatestartuptty /bye
+source .bashrc
 
 # clone dotfiles
 # su $USERNAME -l << EOF
