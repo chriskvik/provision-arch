@@ -39,15 +39,15 @@ useradd -m -g users -G audio,games,rfkill,uucp,video,wheel -s /bin/bash $USERNAM
 yes "$PASSWORD" | passwd $USERNAME || :
 
 # install requirements for provision
-su $USERNAME
 sudo pacman -Syu gnupg2 pcsclite ccid hopenpgp-tools yubikey-personalization acsccid wget openssh
 sudo systemctl enable pcscd.service
 sudo systemctl start pcscd.service 
 
-
-wget -P /home/$USERNAME/.gnupg https://raw.githubusercontent.com/drduh/config/master/gpg-agent.conf
-wget -P /home/$USERNAME/.gnupg https://raw.githubusercontent.com/drduh/config/master/gpg.conf
-chmod 600 /home/christian/.gnupg/gpg.conf
+su $USERNAME -l << EOF
+  wget -P /home/$USERNAME/.gnupg https://raw.githubusercontent.com/drduh/config/master/gpg-agent.conf
+  wget -P /home/$USERNAME/.gnupg https://raw.githubusercontent.com/drduh/config/master/gpg.conf
+  chmod 600 /home/christian/.gnupg/gpg.conf
+EOF
 
 cat <<EOT >> /home/$USERNAME/.bashrc
   export GPG_TTY="$(tty)"
@@ -55,16 +55,18 @@ cat <<EOT >> /home/$USERNAME/.bashrc
   gpgconf --launch gpg-agent
 EOT
 
-source /home/$USERNAME/.bashrc
-killall gpg-agent
-gpg-connect-agent updatestartuptty /bye
+su $USERNAME -l << EOF
+  source /home/$USERNAME/.bashrc
+  killall gpg-agent
+  gpg-connect-agent updatestartuptty /bye
+EOF
 
 # clone dotfiles
  su $USERNAME -l << EOF
   cd ~
   git init
   git remote add origin git@github.com:chriskvik/dotfiles-arch.git
-  git clean -f
+  #git clean -f
   git pull origin master
 EOF
 
