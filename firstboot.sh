@@ -45,4 +45,4 @@ sudo systemctl start pcscd.service
 
 curl -sL https://raw.githubusercontent.com/chriskvik/provision-arch/master/yubikey.sh > /home/$USERNAME/yubikey.sh
 chmod +x /home/$USERNAME/yubikey.sh
-chown $USERNAME:$USERNAME /home/$USERNAME/yubikey.sh
+chown $USERNAME:users /home/$USERNAME/yubikey.sh
