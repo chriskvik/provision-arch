@@ -2,6 +2,8 @@
 # shellcheck disable=SC2086
 set -exuo pipefail
 
+loadkeys no
+
 # don't automatically re-execute if something goes wrong
 rm -rf /root/.profile
 
