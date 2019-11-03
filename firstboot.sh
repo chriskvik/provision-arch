@@ -38,17 +38,35 @@ yes "$PASSWORD" | passwd || :
 useradd -m -g users -G audio,games,rfkill,uucp,video,wheel -s /bin/bash $USERNAME
 yes "$PASSWORD" | passwd $USERNAME || :
 
-# install git
-# pacman -S --noconfirm git
+# install requirements for provision
+su $USERNAME
+sudo pacman -Syu gnupg2 pcsclite ccid hopenpgp-tools yubikey-personalization acsccid wget openssh
+sudo systemctl enable pcscd.service
+sudo systemctl start pcscd.service 
+
+
+wget -P /home/$USERNAME/.gnupg https://raw.githubusercontent.com/drduh/config/master/gpg-agent.conf
+wget -P /home/$USERNAME/.gnupg https://raw.githubusercontent.com/drduh/config/master/gpg.conf
+chmod 600 /home/christian/.gnupg/gpg.conf
+
+cat <<EOT >> /home/$USERNAME/.bashrc
+  export GPG_TTY="$(tty)"
+  export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+  gpgconf --launch gpg-agent
+EOT
+
+source /home/$USERNAME/.bashrc
+killall gpg-agent
+gpg-connect-agent updatestartuptty /bye
 
 # clone dotfiles
-# su $USERNAME -l << EOF
-#  cd ~
-#  git init
-#  git remote add origin https://github.com/Thhethssmuz/dotfiles.git
-#  git clean -f
-#  git pull origin master
-#EOF
+ su $USERNAME -l << EOF
+  cd ~
+  git init
+  git remote add origin git@github.com:chriskvik/dotfiles-arch.git
+  git clean -f
+  git pull origin master
+EOF
 
 # run provision
 #cd ~$USERNAME/.install
