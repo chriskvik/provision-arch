@@ -1,3 +1,5 @@
+sudo dhcpd
+
 wget -P /home/$USERNAME/.gnupg https://raw.githubusercontent.com/drduh/config/master/gpg-agent.conf
 wget -P /home/$USERNAME/.gnupg https://raw.githubusercontent.com/drduh/config/master/gpg.conf
 chmod 600 /home/christian/.gnupg/gpg.conf
