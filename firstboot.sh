@@ -39,7 +39,7 @@ useradd -m -g users -G audio,games,rfkill,uucp,video,wheel -s /bin/bash $USERNAM
 yes "$PASSWORD" | passwd $USERNAME || :
 
 # install requirements for provision
-sudo pacman -Syu gnupg2 pcsclite ccid hopenpgp-tools yubikey-personalization acsccid wget openssh
+sudo pacman -Syu pcsclite ccid hopenpgp-tools yubikey-personalization acsccid wget openssh
 sudo systemctl enable pcscd.service
 sudo systemctl start pcscd.service 
 
